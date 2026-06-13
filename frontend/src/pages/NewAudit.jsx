@@ -60,8 +60,12 @@ export default function NewAudit() {
       const max_pages = depthLimits[scanDepth] || 50
 
       const res = await startAudit(url, { max_pages, scan_depth: scanDepth, wcag_level: wcagLevel })
-      const newAuditId = res.auditId
-      setAuditId(newAuditId)
+
+      console.log("START AUDIT RESPONSE:", res)
+
+      const newAuditId = res.auditId || res.data?.auditId || res.audit_id
+
+setAuditId(newAuditId)
 
       // Poll status
       const pollTimer = setInterval(async () => {

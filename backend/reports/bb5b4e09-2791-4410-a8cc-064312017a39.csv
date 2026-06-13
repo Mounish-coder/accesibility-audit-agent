@@ -1,0 +1,11 @@
+--- AUDIT METADATA ---
+Target URL,https://example.com
+Date,2026-06-13T11:12:48
+Overall Score,94.7
+Pages Crawled,1
+Successful Passes,13
+
+--- ISSUE DETAILS ---
+ID,Description,Severity,WCAG,Category,Element,AI Explanation,Recommendation
+ec177656-aa22-407c-b825-345fc04635c4,Document should have one main landmark,moderate,,Page Structure,"<html lang=""en"">",,
+b9923463-04d9-4405-9f94-dcdee0ee458f,All page content should be contained by landmarks,moderate,,Page Structure,"<div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href=""https://iana.org/domains/example"">Learn more</a></p></div>",,

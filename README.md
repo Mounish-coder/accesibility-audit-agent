@@ -295,6 +295,33 @@ AccessAI Team
 - Testing and validation
 - Deployment and final submission
 
+- Prompt File
+
+Primary Prompt Used
+
+The AI Accessibility Audit Agent was developed with the assistance of AI tools to support debugging, code improvements, architecture decisions, frontend fixes, backend integration, API troubleshooting, and documentation generation.
+
+Key prompts focused on:
+
+- Building an AI-powered accessibility auditing platform
+- WCAG compliance analysis
+- React and FastAPI integration
+- Dashboard analytics implementation
+- Accessibility issue reporting
+- Performance optimization and bug fixing
+
+AI Usage Note
+
+This project utilized AI tools (ChatGPT and Gemini) as development assistants for:
+
+- Debugging and troubleshooting
+- Code improvement suggestions
+- Documentation support
+- Architecture guidance
+- Frontend and backend issue resolution
+
+All final implementation decisions, testing, validation, integration, and project submission were completed by the team members.
+
 ## 📝 License
 
 MIT License — Built for the accessible web. 🌐

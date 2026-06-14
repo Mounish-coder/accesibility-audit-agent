@@ -236,92 +236,124 @@ SECRET_KEY=your-secret-key
 MAX_PAGES=10
 WCAG_LEVEL=AA
 ```
-## Team Information
+---
 
-### Team Name
+👥 Team Information
+
+🚀 Team Name
+
 AccessAI Team
 
-### Team Members
+👨‍💻 Team Members
 
-#### 1. Shamkalla Mounish
-**Branch:** Artificial Intelligence and Machine Learning
+1. Shamkalla Mounish
 
-**Role:** Full Stack Developer
+Branch: Artificial Intelligence and Machine Learning
 
-**Responsibilities:**
-- Frontend Development
-- Backend Development
+Responsibilities:
+
+- Frontend Development (React)
+- Backend Development (FastAPI)
 - Accessibility Audit Integration
-- Testing and Bug Fixing
+- System Testing & Debugging
 
-#### 2. Shaik Saniya Khateeja
-**Branch:** Artificial Intelligence and Data Science
+---
 
-**Role:** AI & Backend Support
+2. Shaik Saniya Khateeja
 
-**Responsibilities:**
+Branch: Artificial Intelligence and Data Science
+
+Responsibilities:
+
 - AI Integration
 - API Development Support
-- Database Support
-- Feature Testing
+- Documentation Assistance
+- Feature Validation & Testing
 
-#### 3. Karimunnisa Shaik
-**Branch:** Computer Science and Engineering (CSE)
+---
 
-**Role:** Documentation & Testing
+3. Karimunnisa Shaik
 
-**Responsibilities:**
+Branch: Computer Science and Engineering (CSE)
+
+Responsibilities:
+
+- Quality Assurance Testing
 - Documentation Preparation
-- Test Case Validation
-- Project Verification
-- Demo Preparation
+- Requirement Validation
+- Demo & Project Verification
 
-- # AI Usage Disclosure
+---
 
-## AI Tools Used
+🤖 AI Usage Disclosure
+
+AI Tools Utilized
+
 - ChatGPT
 - Gemini
 
-## Purpose of AI Usage
-- Debugging backend issues
-- Fixing frontend loading problems
-- API integration assistance
-- Documentation support
-- Error analysis and troubleshooting
+How AI Assisted This Project
 
-## Human Contributions
-- Project design and implementation
-- Feature development
-- Testing and validation
-- Deployment and final submission
+AI tools were used as development assistants for:
 
-- Prompt File
+✅ Backend Debugging and Issue Resolution
 
-Primary Prompt Used
+✅ Frontend Development Support
 
-The AI Accessibility Audit Agent was developed with the assistance of AI tools to support debugging, code improvements, architecture decisions, frontend fixes, backend integration, API troubleshooting, and documentation generation.
+✅ Accessibility Scanner Improvements
 
-Key prompts focused on:
+✅ API Integration Guidance
 
-- Building an AI-powered accessibility auditing platform
-- WCAG compliance analysis
-- React and FastAPI integration
-- Dashboard analytics implementation
-- Accessibility issue reporting
-- Performance optimization and bug fixing
+✅ Documentation Enhancement
 
-AI Usage Note
+✅ Error Analysis and Troubleshooting
 
-This project utilized AI tools (ChatGPT and Gemini) as development assistants for:
+Human Contribution
 
-- Debugging and troubleshooting
-- Code improvement suggestions
-- Documentation support
-- Architecture guidance
-- Frontend and backend issue resolution
+All final implementation, integration, testing, validation, and project decisions were performed by the team members.
 
-All final implementation decisions, testing, validation, integration, and project submission were completed by the team members.
+---
 
+📝 Prompt Documentation
+
+Representative Prompts Used During Development
+
+Backend Debugging
+
+«Investigate FastAPI startup issues and identify the exact exception causing failure.»
+
+Frontend Debugging
+
+«Analyze Dashboard and Audit History loading issues and resolve React state management problems.»
+
+Accessibility Scanner Debugging
+
+«Investigate Playwright scan failures and identify the root cause preventing audit completion.»
+
+AI Integration
+
+«Optimize AI analysis workflow and improve asynchronous API handling.»
+
+Documentation Support
+
+«Generate project documentation, architecture explanations, and setup instructions.»
+
+---
+
+📌 AI Usage Note
+
+The project demonstrates the practical use of AI-assisted software development.
+
+AI was used to:
+
+- Accelerate debugging
+- Improve code quality
+- Assist in documentation
+- Provide development guidance
+
+All generated suggestions were manually reviewed, validated, tested, and integrated by the development team.
+
+---
 ## 📝 License
 
 MIT License — Built for the accessible web. 🌐

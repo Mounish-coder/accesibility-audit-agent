@@ -1,5 +1,6 @@
 """
 Audit API router - core scanning endpoints.
+Deploy: 2026-06-14-fix-empty-response
 """
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends
 from fastapi.responses import JSONResponse

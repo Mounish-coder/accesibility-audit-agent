@@ -7,12 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from datetime import datetime
 import uuid
-import asyncio
 import logging
 
 from app.database import get_db, AsyncSessionLocal
 from app.models import Audit, Issue, AuditStatus
-from app.schemas import AuditRequest, AuditResponse, AuditResultsResponse, StartAuditResponse
+from app.schemas import AuditRequest
 from app.services.scanner import run_accessibility_scan
 from app.services.ai_analyzer import analyze_issue_with_ai
 from app.services.ai_intelligence import run_intelligence_analysis
@@ -21,7 +20,7 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-# In-memory store for active audit progress (for SSE/polling)
+# In-memory store for active audit progress (for status polling)
 _active_audits: dict = {}
 
 
@@ -36,7 +35,7 @@ async def perform_audit(audit_id: str, url: str, wcag_level: str, max_pages: int
         _active_audits[audit_id]["progress"] = 20
         scan_result = await run_accessibility_scan(url, max_pages)
 
-        # Step 2: AI Analysis
+        # Step 2: AI Analysis per issue
         _active_audits[audit_id]["step"] = "analyzing"
         _active_audits[audit_id]["progress"] = 50
 
@@ -49,16 +48,16 @@ async def perform_audit(audit_id: str, url: str, wcag_level: str, max_pages: int
             )
             enriched_issues.append({**issue_data, **ai_result})
 
-        # Step 2.5: AI Intelligence
+        # Step 3: AI Intelligence summary
         _active_audits[audit_id]["step"] = "intelligence"
         _active_audits[audit_id]["progress"] = 70
-        
+
         audit_data = {
             "url": url,
             "score": scan_result["score"],
             "critical": scan_result["counts"].get("critical", 0),
         }
-        
+
         intelligence_data = await run_intelligence_analysis(
             enriched_issues,
             audit_data,
@@ -66,17 +65,16 @@ async def perform_audit(audit_id: str, url: str, wcag_level: str, max_pages: int
             model=settings.GROQ_MODEL,
         )
 
-        # Step 3: Persist to DB
+        # Step 4: Persist to DB
         _active_audits[audit_id]["step"] = "saving"
         _active_audits[audit_id]["progress"] = 85
 
         counts = scan_result["counts"]
-        
+
         async with AsyncSessionLocal() as db:
-            # Update audit record
-            result = await db.execute(select(Audit).where(Audit.id == audit_id))
-            audit = result.scalar_one_or_none()
-            
+            db_result = await db.execute(select(Audit).where(Audit.id == audit_id))
+            audit = db_result.scalar_one_or_none()
+
             if audit:
                 audit.status = AuditStatus.COMPLETED.value
                 audit.score = scan_result["score"]
@@ -90,7 +88,6 @@ async def perform_audit(audit_id: str, url: str, wcag_level: str, max_pages: int
                 audit.ai_intelligence = intelligence_data
                 audit.completed_at = datetime.utcnow()
 
-                # Save issues
                 for issue_data in enriched_issues:
                     issue = Issue(
                         audit_id=audit_id,
@@ -105,31 +102,70 @@ async def perform_audit(audit_id: str, url: str, wcag_level: str, max_pages: int
                         code_example=issue_data.get("codeExample"),
                     )
                     db.add(issue)
-                
+
                 await db.commit()
             else:
-                logger.error(f"Audit {audit_id} not found in database during saving!")
+                logger.error(f"Audit {audit_id} not found in DB during saving!")
 
         _active_audits[audit_id] = {"status": "completed", "step": "done", "progress": 100}
         logger.info(f"Audit {audit_id} completed. Score: {scan_result['score']}")
 
     except Exception as e:
-        logger.error(f"Audit {audit_id} failed: {e}")
+        logger.error(f"Audit {audit_id} failed: {e}", exc_info=True)
         _active_audits[audit_id] = {"status": "failed", "error": str(e)}
-        
+
         try:
             async with AsyncSessionLocal() as db:
-                result = await db.execute(select(Audit).where(Audit.id == audit_id))
-                audit = result.scalar_one_or_none()
+                db_result = await db.execute(select(Audit).where(Audit.id == audit_id))
+                audit = db_result.scalar_one_or_none()
                 if audit:
                     audit.status = AuditStatus.FAILED.value
                     audit.error_message = str(e)
                     await db.commit()
         except Exception as db_err:
-            logger.error(f"Failed to update audit status: {db_err}")
+            logger.error(f"Failed to mark audit {audit_id} as failed in DB: {db_err}")
 
 
-@router.post("/start", response_model=StartAuditResponse)
+# ─────────────────────────────────────────────────────────────────────────────
+# CRITICAL: /history MUST be registered BEFORE /{audit_id}/* routes.
+# FastAPI matches routes in registration order. Without this ordering,
+# GET /history matches /{audit_id}/status with audit_id="history".
+# ─────────────────────────────────────────────────────────────────────────────
+
+@router.get("/history")
+async def get_audit_history(
+    limit: int = 20,
+    offset: int = 0,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get audit history with pagination."""
+    db_result = await db.execute(
+        select(Audit)
+        .order_by(Audit.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    audits = db_result.scalars().all()
+
+    total_result = await db.execute(select(func.count(Audit.id)))
+    total = total_result.scalar() or 0
+
+    return JSONResponse(content={
+        "audits": [a.to_dict() for a in audits],
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    })
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CRITICAL: Do NOT add response_model= here when returning JSONResponse.
+# Specifying response_model on a route that returns JSONResponse causes FastAPI
+# to try to serialize the JSONResponse object through Pydantic, producing an
+# empty body (Content-Length: 0). Return JSONResponse directly — no model needed.
+# ─────────────────────────────────────────────────────────────────────────────
+
+@router.post("/start")
 async def start_audit(
     request: AuditRequest,
     background_tasks: BackgroundTasks,
@@ -137,15 +173,12 @@ async def start_audit(
 ):
     """Start a new accessibility audit."""
     try:
-        # Normalize URL
         url = request.url.strip()
         if not url.startswith(("http://", "https://")):
             url = f"https://{url}"
 
-        # Safe unwrapping of Enum
-        wcag_val = request.wcag_level.value if hasattr(request.wcag_level, 'value') else request.wcag_level
+        wcag_val = request.wcag_level.value if hasattr(request.wcag_level, "value") else request.wcag_level
 
-        # Create audit record
         audit_id = str(uuid.uuid4())
         audit = Audit(
             id=audit_id,
@@ -158,27 +191,24 @@ async def start_audit(
         db.add(audit)
         await db.commit()
 
-        # Queue background scan
-        background_tasks.add_task(
-            perform_audit, audit_id, url, wcag_val, request.max_pages
-        )
+        background_tasks.add_task(perform_audit, audit_id, url, wcag_val, request.max_pages)
 
         return JSONResponse(
             status_code=200,
             content={
-                "auditId": audit_id, 
+                "auditId": audit_id,
                 "audit_id": audit_id,
                 "id": audit_id,
-                "status": "running", 
-                "message": "Audit started"
-            }
+                "status": "running",
+                "message": "Audit started successfully",
+            },
         )
     except Exception as e:
         await db.rollback()
         logger.exception(f"Failed to start audit for {request.url}: {e}")
         return JSONResponse(
             status_code=500,
-            content={"status": "failed", "message": f"Server Error: {str(e)}"}
+            content={"status": "failed", "message": f"Server Error: {str(e)}"},
         )
 
 
@@ -186,35 +216,36 @@ async def start_audit(
 async def get_audit_status(audit_id: str):
     """Get real-time audit progress."""
     progress = _active_audits.get(audit_id, {"status": "unknown"})
-    return {"auditId": audit_id, **progress}
+    return JSONResponse(content={"auditId": audit_id, **progress})
 
 
 @router.get("/{audit_id}/results")
 async def get_audit_results(audit_id: str, db: AsyncSession = Depends(get_db)):
     """Get completed audit results."""
     try:
-        # Get audit
-        result = await db.execute(select(Audit).where(Audit.id == audit_id))
-        audit = result.scalar_one_or_none()
-        
+        db_result = await db.execute(select(Audit).where(Audit.id == audit_id))
+        audit = db_result.scalar_one_or_none()
+
         if not audit:
             raise HTTPException(status_code=404, detail="Audit not found")
-        
-        status_val = audit.status.value if hasattr(audit.status, 'value') else audit.status
-        if status_val == AuditStatus.FAILED.value or status_val == "failed":
-            return {"status": "failed", "message": audit.error_message or "Audit failed during execution."}
-        elif status_val != AuditStatus.COMPLETED.value and status_val != "completed":
-            return {"status": status_val, "message": "Audit not yet complete"}
 
-        # Get issues
+        status_val = audit.status.value if hasattr(audit.status, "value") else audit.status
+
+        if status_val in (AuditStatus.FAILED.value, "failed"):
+            return JSONResponse(content={
+                "status": "failed",
+                "message": audit.error_message or "Audit failed during execution.",
+            })
+        if status_val not in (AuditStatus.COMPLETED.value, "completed"):
+            return JSONResponse(content={"status": status_val, "message": "Audit not yet complete"})
+
         issues_result = await db.execute(select(Issue).where(Issue.audit_id == audit_id))
         issues = issues_result.scalars().all()
 
-        # Build categories
         STANDARD_CATEGORIES = [
             "Images & Media", "Forms & Inputs", "Color & Contrast",
             "Keyboard & Focus", "Page Structure", "Navigation & Links",
-            "ARIA & Semantics"
+            "ARIA & Semantics",
         ]
         categories = {cat: {"score": 100, "issues": 0} for cat in STANDARD_CATEGORIES}
 
@@ -224,12 +255,10 @@ async def get_audit_results(audit_id: str, db: AsyncSession = Depends(get_db)):
                 categories[cat] = {"score": 100, "issues": 0}
             categories[cat]["issues"] += 1
 
-        # Calculate category scores
         for cat in categories:
             cat_issues = categories[cat]["issues"]
             categories[cat]["score"] = max(0, 100 - cat_issues * 15)
 
-        # Handle SQLite JSON string issue
         import json
         ai_data = audit.ai_intelligence
         if isinstance(ai_data, str):
@@ -237,15 +266,13 @@ async def get_audit_results(audit_id: str, db: AsyncSession = Depends(get_db)):
                 ai_data = json.loads(ai_data)
             except Exception:
                 ai_data = None
-                
-
 
         def safe_isoformat(dt):
             if not dt:
                 return None
-            return dt.isoformat() if hasattr(dt, 'isoformat') else str(dt)
+            return dt.isoformat() if hasattr(dt, "isoformat") else str(dt)
 
-        return {
+        return JSONResponse(content={
             "id": audit.id,
             "url": audit.url,
             "status": status_val,
@@ -265,20 +292,15 @@ async def get_audit_results(audit_id: str, db: AsyncSession = Depends(get_db)):
             "aiIntelligence": ai_data,
             "createdAt": safe_isoformat(audit.created_at),
             "completedAt": safe_isoformat(audit.completed_at),
-        }
+        })
     except HTTPException:
         raise
     except Exception as e:
         await db.rollback()
-        logger.exception(f"Detailed error in get_audit_results for {audit_id}: {e}")
+        logger.exception(f"Error in get_audit_results for {audit_id}: {e}")
         return JSONResponse(
-            status_code=200,
-            content={
-                "status": "failed",
-                "message": f"Backend Error: {str(e)}",
-                "id": audit_id,
-                "url": "Error",
-            }
+            status_code=500,
+            content={"status": "failed", "message": f"Backend Error: {str(e)}", "id": audit_id},
         )
 
 
@@ -288,37 +310,11 @@ async def cancel_audit(audit_id: str, db: AsyncSession = Depends(get_db)):
     if audit_id in _active_audits:
         _active_audits[audit_id]["status"] = "cancelled"
 
-    result = await db.execute(select(Audit).where(Audit.id == audit_id))
-    audit = result.scalar_one_or_none()
-    
-    if audit and audit.status == AuditStatus.RUNNING:
-        audit.status = AuditStatus.CANCELLED
+    db_result = await db.execute(select(Audit).where(Audit.id == audit_id))
+    audit = db_result.scalar_one_or_none()
+
+    if audit and audit.status == AuditStatus.RUNNING.value:
+        audit.status = AuditStatus.CANCELLED.value
         await db.commit()
 
-    return {"auditId": audit_id, "status": "cancelled"}
-
-
-@router.get("/history")
-async def get_audit_history(
-    limit: int = 20,
-    offset: int = 0,
-    db: AsyncSession = Depends(get_db),
-):
-    """Get audit history with pagination."""
-    result = await db.execute(
-        select(Audit)
-        .order_by(Audit.created_at.desc())
-        .limit(limit)
-        .offset(offset)
-    )
-    audits = result.scalars().all()
-    
-    total_result = await db.execute(select(func.count(Audit.id)))
-    total = total_result.scalar()
-
-    return {
-        "audits": [a.to_dict() for a in audits],
-        "total": total,
-        "limit": limit,
-        "offset": offset,
-    }
+    return JSONResponse(content={"auditId": audit_id, "status": "cancelled"})

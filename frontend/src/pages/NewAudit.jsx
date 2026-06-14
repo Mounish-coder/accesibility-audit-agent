@@ -59,22 +59,14 @@ export default function NewAudit() {
       }
       const max_pages = depthLimits[scanDepth] || 50
 
+      // api.js interceptor returns response.data directly (already parsed by Axios)
       const res = await startAudit(url, { max_pages, scan_depth: scanDepth, wcag_level: wcagLevel })
 
-      let parsedRes = {};
-      if (typeof res === 'string') {
-        try {
-          parsedRes = res.trim() ? JSON.parse(res) : {};
-        } catch (e) {
-          console.error("Failed to parse API response:", res);
-        }
-      } else {
-        parsedRes = res || {};
-      }
-      const newAuditId = parsedRes.auditId || parsedRes.audit_id || parsedRes.id || parsedRes.data?.auditId || parsedRes.data?.audit_id || parsedRes.data?.id;
+      // Backend returns: { auditId, audit_id, id, status, message }
+      const newAuditId = res?.auditId || res?.audit_id || res?.id
 
       if (!newAuditId) {
-        throw new Error('No audit ID returned from server');
+        throw new Error(`Failed to get audit ID from server. Response: ${JSON.stringify(res)}`)
       }
 
       setAuditId(newAuditId)

@@ -5,8 +5,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# SQLite (aiosqlite) does not support pool_size / max_overflow.
-# Use connect_args for SQLite thread-safety; for PostgreSQL remove connect_args.
 _is_sqlite = settings.DATABASE_URL.startswith("sqlite")
 
 engine = create_async_engine(
@@ -30,19 +28,25 @@ async def init_db():
     """Create all database tables."""
     try:
         async with engine.begin() as conn:
-            from app import models  # noqa: F401 - ensures models are registered
+            from app import models  # noqa: F401
             await conn.run_sync(Base.metadata.create_all)
         logger.info("Database tables created successfully.")
     except Exception as e:
-        logger.warning(f"Database init warning (may be running without DB): {e}")
+        logger.warning(f"Database init warning: {e}")
 
 
 async def get_db() -> AsyncSession:
-    """Dependency for database sessions."""
+    """
+    Dependency that provides a DB session.
+    The route handler is responsible for commit/rollback.
+    This dependency ONLY closes the session on exit — it does NOT auto-commit.
+    Auto-committing here caused a double-commit error when background tasks
+    were pending, causing Starlette to close the response stream before the
+    body was flushed (HTTP 200 with empty body).
+    """
     async with AsyncSessionLocal() as session:
         try:
             yield session
-            await session.commit()
         except Exception:
             await session.rollback()
             raise

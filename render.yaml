@@ -1,0 +1,24 @@
+services:
+  # Backend FastAPI service
+  - type: web
+    name: backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    port: 8000
+    healthCheckPath: /health
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: llama3-70b-8192
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./accessai.db
+
+  # Frontend nginx service (proxies /api/ to backend via Render private network)
+  - type: web
+    name: frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    port: 80

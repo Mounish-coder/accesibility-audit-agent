@@ -1,6 +1,5 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
 from contextlib import asynccontextmanager
 import uvicorn
 import logging
@@ -18,24 +17,21 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan manager."""
-    logger.info("Starting AccessAI Accessibility Audit Agent API...")
+    logger.info("Starting AccessAI API...")
     await init_db()
     logger.info("Database initialized.")
     yield
-    logger.info("Shutting down AccessAI API...")
+    logger.info("Shutting down AccessAI API.")
 
 
 app = FastAPI(
     title="AccessAI - Accessibility Audit Agent API",
-    description="AI-powered web accessibility auditing platform with WCAG compliance checking",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan,
 )
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -44,16 +40,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Routers
-app.include_router(audit.router, prefix="/audit", tags=["Audit"])
-app.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
-app.include_router(reports.router, prefix="/reports", tags=["Reports"])
-app.include_router(settings.router, prefix="/settings", tags=["Settings"])
+# Mount with /api prefix so the frontend's baseURL '/api' works both:
+# - Through the nginx proxy (nginx strips /api/ before forwarding)
+# - Directly against the backend on Render (no proxy needed)
+app.include_router(audit.router,      prefix="/api/audit",      tags=["Audit"])
+app.include_router(dashboard.router,  prefix="/api/dashboard",  tags=["Dashboard"])
+app.include_router(reports.router,    prefix="/api/reports",    tags=["Reports"])
+app.include_router(settings.router,   prefix="/api/settings",   tags=["Settings"])
+
+# Keep legacy routes without /api prefix for backward compatibility
+app.include_router(audit.router,      prefix="/audit",      tags=["Audit-legacy"])
+app.include_router(dashboard.router,  prefix="/dashboard",  tags=["Dashboard-legacy"])
 
 
 @app.get("/", tags=["Health"])
 async def root():
-    return {"status": "running", "service": "Accessibility Audit Agent"}
+    return {"status": "running", "service": "AccessAI"}
+
 
 @app.get("/health", tags=["Health"])
 async def health_check():
@@ -61,10 +64,4 @@ async def health_check():
 
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info",
-    )
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

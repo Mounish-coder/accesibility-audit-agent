@@ -61,11 +61,14 @@ export default function NewAudit() {
 
       const res = await startAudit(url, { max_pages, scan_depth: scanDepth, wcag_level: wcagLevel })
 
-      console.log("START AUDIT RESPONSE:", JSON.stringify(res))
+      const parsedRes = typeof res === 'string' ? JSON.parse(res) : (res || {});
+      const newAuditId = parsedRes.auditId || parsedRes.audit_id || parsedRes.id || parsedRes.data?.auditId || parsedRes.data?.audit_id || parsedRes.data?.id;
 
-      const newAuditId = res.auditId || res.data?.auditId || res.audit_id
+      if (!newAuditId) {
+        throw new Error('No audit ID returned from server');
+      }
 
-setAuditId(newAuditId)
+      setAuditId(newAuditId)
 
       // Poll status
       const pollTimer = setInterval(async () => {

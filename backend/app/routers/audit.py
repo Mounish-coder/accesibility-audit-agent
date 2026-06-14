@@ -12,7 +12,7 @@ import logging
 
 from app.database import get_db, AsyncSessionLocal
 from app.models import Audit, Issue, AuditStatus
-from app.schemas import AuditRequest, AuditResponse, AuditResultsResponse
+from app.schemas import AuditRequest, AuditResponse, AuditResultsResponse, StartAuditResponse
 from app.services.scanner import run_accessibility_scan
 from app.services.ai_analyzer import analyze_issue_with_ai
 from app.services.ai_intelligence import run_intelligence_analysis
@@ -129,7 +129,7 @@ async def perform_audit(audit_id: str, url: str, wcag_level: str, max_pages: int
             logger.error(f"Failed to update audit status: {db_err}")
 
 
-@router.post("/start")
+@router.post("/start", response_model=StartAuditResponse)
 async def start_audit(
     request: AuditRequest,
     background_tasks: BackgroundTasks,
@@ -163,13 +163,16 @@ async def start_audit(
             perform_audit, audit_id, url, wcag_val, request.max_pages
         )
 
-        return {
-            "auditId": audit_id, 
-            "audit_id": audit_id,
-            "id": audit_id,
-            "status": "running", 
-            "message": "Audit started"
-        }
+        return JSONResponse(
+            status_code=200,
+            content={
+                "auditId": audit_id, 
+                "audit_id": audit_id,
+                "id": audit_id,
+                "status": "running", 
+                "message": "Audit started"
+            }
+        )
     except Exception as e:
         await db.rollback()
         logger.exception(f"Failed to start audit for {request.url}: {e}")

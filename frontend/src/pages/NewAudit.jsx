@@ -61,7 +61,16 @@ export default function NewAudit() {
 
       const res = await startAudit(url, { max_pages, scan_depth: scanDepth, wcag_level: wcagLevel })
 
-      const parsedRes = typeof res === 'string' ? JSON.parse(res) : (res || {});
+      let parsedRes = {};
+      if (typeof res === 'string') {
+        try {
+          parsedRes = res.trim() ? JSON.parse(res) : {};
+        } catch (e) {
+          console.error("Failed to parse API response:", res);
+        }
+      } else {
+        parsedRes = res || {};
+      }
       const newAuditId = parsedRes.auditId || parsedRes.audit_id || parsedRes.id || parsedRes.data?.auditId || parsedRes.data?.audit_id || parsedRes.data?.id;
 
       if (!newAuditId) {

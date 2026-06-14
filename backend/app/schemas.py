@@ -52,6 +52,14 @@ class AuditResponse(BaseModel):
     completedAt: Optional[str]
 
 
+class StartAuditResponse(BaseModel):
+    auditId: str
+    audit_id: str
+    id: str
+    status: str
+    message: str
+
+
 class AuditResultsResponse(BaseModel):
     id: str
     url: str

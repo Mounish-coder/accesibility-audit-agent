@@ -159,14 +159,9 @@ async def get_audit_history(
     })
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# CRITICAL: Do NOT add response_model= here when returning JSONResponse.
-# Specifying response_model on a route that returns JSONResponse causes FastAPI
-# to try to serialize the JSONResponse object through Pydantic, producing an
-# empty body (Content-Length: 0). Return JSONResponse directly — no model needed.
-# ─────────────────────────────────────────────────────────────────────────────
+from app.schemas import AuditRequest, StartAuditResponse
 
-@router.post("/start")
+@router.post("/start", response_model=StartAuditResponse)
 async def start_audit(
     request: AuditRequest,
     background_tasks: BackgroundTasks,
@@ -194,16 +189,10 @@ async def start_audit(
 
         background_tasks.add_task(perform_audit, audit_id, url, wcag_val, request.max_pages)
 
-        return JSONResponse(
-            status_code=200,
-            content={
-                "auditId": audit_id,
-                "audit_id": audit_id,
-                "id": audit_id,
-                "status": "running",
-                "message": "Audit started successfully",
-            },
-        )
+        return {
+            "auditId": audit_id,
+            "status": "running",
+        }
     except Exception as e:
         await db.rollback()
         logger.exception(f"Failed to start audit for {request.url}: {e}")

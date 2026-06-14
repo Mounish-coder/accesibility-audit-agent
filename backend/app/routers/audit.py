@@ -163,6 +163,8 @@ async def start_audit(
             perform_audit, audit_id, url, wcag_val, request.max_pages
         )
 
+        print("RETURNING AUDIT ID:",audit_id)
+
         return {"auditId": audit_id, "status": "running", "message": "Audit started"}
     except Exception as e:
         await db.rollback()

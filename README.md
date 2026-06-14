@@ -1,13 +1,3 @@
-## 🔗 Project Links
-
-🌐 Source Code Repository:
-https://github.com/Mounish-coder/accesibility-audit-agent
-
-🚀 Live Demo:
-https://accesibility-audit-agent-frontend.onrender.com
-
-📄 API Documentation:
-https://accesibility-audit-agent-backend.onrender.com
 
 # AccessAI — AI-Powered Accessibility Audit Agent
 
@@ -23,6 +13,18 @@ https://accesibility-audit-agent-backend.onrender.com
 ---
 
 A **production-grade**, **portfolio-quality** AI application that scans websites for WCAG accessibility violations, uses Groq AI to generate intelligent explanations and code fixes, and produces professional downloadable reports — all inside a stunning glassmorphism dashboard.
+
+## 🔗 Project Links
+
+🌐 Source Code Repository:
+https://github.com/Mounish-coder/accesibility-audit-agent
+
+🚀 Live Demo:
+https://accesibility-audit-agent-frontend.onrender.com
+
+📄 API Documentation:
+https://accesibility-audit-agent-backend.onrender.com
+
 
 ## 📸 Screenshots
 
@@ -429,6 +431,86 @@ Limitations
 - 📈 Accessibility findings are based on automated WCAG checks and should be complemented with manual review for maximum accuracy.
 
 ---
+
+🎬 Project Demonstration Video
+
+«Experience the complete journey of the AccessAI Platform — from source code to live deployment, accessibility auditing, AI-powered analysis, and final reporting.»
+
+🔗 Demo Video
+
+📹 Video Link:
+🚀 To be added before final submission
+
+---
+
+🌟 What This Demonstration Covers
+
+💻 Source Code Walkthrough
+
+- Complete GitHub Repository Overview
+- Frontend Architecture (React + Vite)
+- Backend Architecture (FastAPI)
+- Database & API Structure
+- Project Folder Organization
+
+🚀 Live Deployment Showcase
+
+- Render Deployment Configuration
+- Hosted Application Verification
+- Production Environment Overview
+
+🎯 Accessibility Audit Workflow
+
+- Creating a New Accessibility Audit
+- Real-Time Accessibility Scanning
+- WCAG Compliance Analysis
+- Accessibility Score Generation
+
+🤖 AI-Powered Intelligence
+
+- AI-Based Accessibility Insights
+- Automated Issue Classification
+- Smart Remediation Recommendations
+- Improvement Suggestions
+
+📊 Dashboard & Analytics
+
+- Audit Statistics Overview
+- Accessibility Trends
+- Historical Audit Records
+- Performance Metrics
+
+📋 Reports & Results
+
+- Detailed Accessibility Reports
+- Critical & Warning Issue Analysis
+- AI Recommendations Dashboard
+- Complete Audit History
+
+---
+
+✅ End-to-End Validation
+
+The demonstration verifies that the entire platform functions successfully from:
+
+Input URL → Accessibility Scan → AI Analysis → Dashboard Analytics → Final Report Generation
+
+---
+
+🏆 Project Deliverables Demonstrated
+
+✅ Public GitHub Repository
+✅ Working Source Code
+✅ Live Hosted Application
+✅ Accessibility Audit Engine
+✅ AI-Powered Analysis
+✅ Dashboard & Analytics
+✅ Report Generation
+✅ End-to-End Functionality Verification
+
+---
+
+«AccessAI — Making the Web More Accessible Through AI-Powered Auditing and Intelligent Recommendations.»
 
 «💡 Note: AccessAI is designed to accelerate accessibility auditing and remediation, helping developers identify issues faster and improve overall WCAG compliance.»
 ---

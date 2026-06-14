@@ -14,6 +14,9 @@
 
 A **production-grade**, **portfolio-quality** AI application that scans websites for WCAG accessibility violations, uses Groq AI to generate intelligent explanations and code fixes, and produces professional downloadable reports — all inside a stunning glassmorphism dashboard.
 
+🎯 Problem Statement
+
+Many websites contain accessibility issues that make them difficult to use for people with disabilities. Manual accessibility auditing is time-consuming and often inconsistent. AccessAI provides an AI-powered accessibility auditing platform that automatically scans websites, identifies WCAG compliance issues, generates accessibility scores, and provides intelligent recommendations to help developers improve web accessibility.
 ## 🔗 Project Links
 
 🌐 Source Code Repository:
@@ -319,34 +322,6 @@ Responsibilities:
 
 ---
 
-🤖 AI Usage Disclosure
-
-AI Tools Utilized
-
-- ChatGPT
-- Gemini
-
-How AI Assisted This Project
-
-AI tools were used as development assistants for:
-
-✅ Backend Debugging and Issue Resolution
-
-✅ Frontend Development Support
-
-✅ Accessibility Scanner Improvements
-
-✅ API Integration Guidance
-
-✅ Documentation Enhancement
-
-✅ Error Analysis and Troubleshooting
-
-Human Contribution
-
-All final implementation, integration, testing, validation, and project decisions were performed by the team members.
-
----
 
 📝 Prompt Documentation
 

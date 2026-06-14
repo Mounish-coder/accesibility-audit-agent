@@ -276,6 +276,25 @@ AccessAI Team
 - Project Verification
 - Demo Preparation
 
+- # AI Usage Disclosure
+
+## AI Tools Used
+- ChatGPT
+- Gemini
+
+## Purpose of AI Usage
+- Debugging backend issues
+- Fixing frontend loading problems
+- API integration assistance
+- Documentation support
+- Error analysis and troubleshooting
+
+## Human Contributions
+- Project design and implementation
+- Feature development
+- Testing and validation
+- Deployment and final submission
+
 ## 📝 License
 
 MIT License — Built for the accessible web. 🌐

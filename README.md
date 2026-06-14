@@ -17,6 +17,54 @@ A **production-grade**, **portfolio-quality** AI application that scans websites
 🎯 Problem Statement
 
 Many websites contain accessibility issues that make them difficult to use for people with disabilities. Manual accessibility auditing is time-consuming and often inconsistent. AccessAI provides an AI-powered accessibility auditing platform that automatically scans websites, identifies WCAG compliance issues, generates accessibility scores, and provides intelligent recommendations to help developers improve web accessibility.
+
+
+👥 Team Information
+
+🚀 Team Name
+
+AccessAI Team
+
+👨‍💻 Team Members
+
+1. Shamkalla Mounish
+
+Branch: Artificial Intelligence and Machine Learning
+
+Responsibilities:
+
+- Frontend Development (React)
+- Backend Development (FastAPI)
+- Accessibility Audit Integration
+- System Testing & Debugging
+
+---
+
+2. Shaik Saniya Khateeja
+
+Branch: Artificial Intelligence and Data Science
+
+Responsibilities:
+
+- AI Integration
+- API Development Support
+- Documentation Assistance
+- Feature Validation & Testing
+
+---
+
+3. Karimunnisa Shaik
+
+Branch: Computer Science and Engineering (CSE)
+
+Responsibilities:
+
+- Quality Assurance Testing
+- Documentation Preparation
+- Requirement Validation
+- Demo & Project Verification
+
+
 ## 🔗 Project Links
 
 🌐 Source Code Repository:
@@ -243,52 +291,6 @@ MAX_PAGES=10
 WCAG_LEVEL=AA
 ```
 ---
-
-👥 Team Information
-
-🚀 Team Name
-
-AccessAI Team
-
-👨‍💻 Team Members
-
-1. Shamkalla Mounish
-
-Branch: Artificial Intelligence and Machine Learning
-
-Responsibilities:
-
-- Frontend Development (React)
-- Backend Development (FastAPI)
-- Accessibility Audit Integration
-- System Testing & Debugging
-
----
-
-2. Shaik Saniya Khateeja
-
-Branch: Artificial Intelligence and Data Science
-
-Responsibilities:
-
-- AI Integration
-- API Development Support
-- Documentation Assistance
-- Feature Validation & Testing
-
----
-
-3. Karimunnisa Shaik
-
-Branch: Computer Science and Engineering (CSE)
-
-Responsibilities:
-
-- Quality Assurance Testing
-- Documentation Preparation
-- Requirement Validation
-- Demo & Project Verification
-
 ---
 
 

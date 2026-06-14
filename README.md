@@ -197,7 +197,7 @@ Full interactive docs: **http://localhost:8000/api/docs**
 - Rules mapped to WCAG 2.1 A, AA, and AAA levels
 - Multi-page crawling with configurable depth
 
-##✨ Features Implemented
+✨ Features Implemented
 
 - 📊 Dashboard Analytics
 - 🔍 Accessibility Website Auditing

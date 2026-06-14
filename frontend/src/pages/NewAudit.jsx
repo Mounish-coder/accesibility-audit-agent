@@ -61,7 +61,7 @@ export default function NewAudit() {
 
       const res = await startAudit(url, { max_pages, scan_depth: scanDepth, wcag_level: wcagLevel })
 
-      console.log("START AUDIT RESPONSE:", res)
+      console.log("START AUDIT RESPONSE:", JSON.stringify(res))
 
       const newAuditId = res.auditId || res.data?.auditId || res.audit_id
 

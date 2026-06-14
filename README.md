@@ -353,6 +353,52 @@ AI was used to:
 
 All generated suggestions were manually reviewed, validated, tested, and integrated by the development team.
 
+🎯 Sample Usage
+
+🌐 Input Website
+
+https://example.com
+
+📊 Audit Results
+
+Metric| Result
+Accessibility Score| ⭐ 87/100
+Critical Issues| 🔴 2
+Warnings| 🟡 5
+Passed Checks| ✅ 45
+
+🤖 AI-Generated Deliverables
+
+✅ Detailed Accessibility Report
+
+✅ Intelligent AI Recommendations
+
+✅ WCAG Compliance Analysis
+
+✅ Actionable Code Fix Suggestions
+
+✅ Executive Summary for Stakeholders
+
+---
+
+⚠️ Assumptions & Limitations
+
+Assumptions
+
+- 🌐 Active internet connection is required.
+- 🔑 AI-powered analysis requires a valid Groq API key.
+- 📄 Target website must allow page crawling and accessibility scanning.
+
+Limitations
+
+- 🚫 Some websites may block automated scanners and crawlers.
+- ⏳ Large or highly dynamic websites may require additional scan time.
+- 🎭 JavaScript-heavy applications may produce varying results depending on page state.
+- 📈 Accessibility findings are based on automated WCAG checks and should be complemented with manual review for maximum accuracy.
+
+---
+
+«💡 Note: AccessAI is designed to accelerate accessibility auditing and remediation, helping developers identify issues faster and improve overall WCAG compliance.»
 ---
 ## 📝 License
 

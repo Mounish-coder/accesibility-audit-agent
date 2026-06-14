@@ -236,6 +236,45 @@ SECRET_KEY=your-secret-key
 MAX_PAGES=10
 WCAG_LEVEL=AA
 ```
+## Team Information
+
+### Team Name
+AccessAI Team
+
+### Team Members
+
+#### 1. Shamkalla Mounish
+**Branch:** Artificial Intelligence and Machine Learning
+
+**Role:** Full Stack Developer
+
+**Responsibilities:**
+- Frontend Development
+- Backend Development
+- Accessibility Audit Integration
+- Testing and Bug Fixing
+
+#### 2. Shaik Saniya Khateeja
+**Branch:** Artificial Intelligence and Data Science
+
+**Role:** AI & Backend Support
+
+**Responsibilities:**
+- AI Integration
+- API Development Support
+- Database Support
+- Feature Testing
+
+#### 3. Karimunnisa Shaik
+**Branch:** Computer Science and Engineering (CSE)
+
+**Role:** Documentation & Testing
+
+**Responsibilities:**
+- Documentation Preparation
+- Test Case Validation
+- Project Verification
+- Demo Preparation
 
 ## 📝 License
 

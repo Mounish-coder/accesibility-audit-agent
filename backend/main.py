@@ -48,9 +48,7 @@ app.include_router(dashboard.router,  prefix="/api/dashboard",  tags=["Dashboard
 app.include_router(reports.router,    prefix="/api/reports",    tags=["Reports"])
 app.include_router(settings.router,   prefix="/api/settings",   tags=["Settings"])
 
-# Keep legacy routes without /api prefix for backward compatibility
-app.include_router(audit.router,      prefix="/audit",      tags=["Audit-legacy"])
-app.include_router(dashboard.router,  prefix="/dashboard",  tags=["Dashboard-legacy"])
+
 
 
 @app.get("/", tags=["Health"])

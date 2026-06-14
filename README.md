@@ -24,42 +24,31 @@ https://accesibility-audit-agent-frontend.onrender.com
 
 A **production-grade**, **portfolio-quality** AI application that scans websites for WCAG accessibility violations, uses Groq AI to generate intelligent explanations and code fixes, and produces professional downloadable reports — all inside a stunning glassmorphism dashboard.
 
-## 🔗 Project Links
-
-🌐 Source Code Repository:
-https://github.com/Mounish-coder/accesibility-audit-agent
-
-🚀 Live Demo:
-https://YOUR-RENDER-URL.onrender.com
-
-📄 API Documentation:
-https://YOUR-BACKEND-URL.onrender.com/docs
-
 ## 📸 Screenshots
 
 ### 🏠 Landing Page
 
-![Landing Page](<img width="1920" height="1140" alt="Screenshot 2026-06-13 141818" src="https://github.com/user-attachments/assets/765b2222-0aee-4051-a454-f28b1e1ae248" />
-)
+<img width="1920" height="1140" alt="Screenshot 2026-06-13 141818" src="https://github.com/user-attachments/assets/765b2222-0aee-4051-a454-f28b1e1ae248" />
+
 
 ### 📊 Dashboard
 
-![Dashboard](<img width="1920" height="1140" alt="Screenshot 2026-06-13 164557" src="https://github.com/user-attachments/assets/bf1baea8-4dce-4e59-ad38-e712c93001dc" />
-)
+<img width="1920" height="1140" alt="Screenshot 2026-06-13 164557" src="https://github.com/user-attachments/assets/bf1baea8-4dce-4e59-ad38-e712c93001dc" />
+
 
 ### 🔍 New Audit
 
-![New Audit](<img width="1920" height="1140" alt="Screenshot 2026-06-13 164529" src="https://github.com/user-attachments/assets/4455e2e2-8b3d-443a-8ebc-33c8392d1301" />
+(<img width="1920" height="1140" alt="Screenshot 2026-06-13 164529" src="https://github.com/user-attachments/assets/4455e2e2-8b3d-443a-8ebc-33c8392d1301" />
 )
 
 ### ✅ Audit Results
 
-![Audit Results](<img width="1920" height="1140" alt="Screenshot 2026-06-13 164626" src="https://github.com/user-attachments/assets/8a616828-383b-462d-9638-fc871f05537c" />
+(<img width="1920" height="1140" alt="Screenshot 2026-06-13 164626" src="https://github.com/user-attachments/assets/8a616828-383b-462d-9638-fc871f05537c" />
 )
 
 ### 📄 Reports
 
-![Reports](<img width="1920" height="1140" alt="Screenshot 2026-06-13 164816" src="https://github.com/user-attachments/assets/98b84f5c-5868-49bc-ba8b-e07d77b6e662" />
+(<img width="1920" height="1140" alt="Screenshot 2026-06-13 164816" src="https://github.com/user-attachments/assets/98b84f5c-5868-49bc-ba8b-e07d77b6e662" />
 )
 
 ## 🚀 Quick Start

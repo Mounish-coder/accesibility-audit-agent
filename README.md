@@ -1,3 +1,14 @@
+## 🔗 Project Links
+
+🌐 Source Code Repository:
+https://github.com/Mounish-coder/accesibility-audit-agent
+
+🚀 Live Demo:
+https://YOUR-RENDER-URL.onrender.com
+
+📄 API Documentation:
+https://YOUR-BACKEND-URL.onrender.com/docs
+
 # AccessAI — AI-Powered Accessibility Audit Agent
 
 <div align="center">
@@ -12,6 +23,17 @@
 ---
 
 A **production-grade**, **portfolio-quality** AI application that scans websites for WCAG accessibility violations, uses Groq AI to generate intelligent explanations and code fixes, and produces professional downloadable reports — all inside a stunning glassmorphism dashboard.
+
+## 🔗 Project Links
+
+🌐 Source Code Repository:
+https://github.com/Mounish-coder/accesibility-audit-agent
+
+🚀 Live Demo:
+https://YOUR-RENDER-URL.onrender.com
+
+📄 API Documentation:
+https://YOUR-BACKEND-URL.onrender.com/docs
 
 ## 📸 Screenshots
 

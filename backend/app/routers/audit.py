@@ -161,7 +161,7 @@ async def get_audit_history(
 
 from app.schemas import AuditRequest, StartAuditResponse
 
-@router.post("/start", response_model=StartAuditResponse)
+@router.post("/start")
 async def start_audit(
     request: AuditRequest,
     background_tasks: BackgroundTasks,
@@ -189,10 +189,13 @@ async def start_audit(
 
         background_tasks.add_task(perform_audit, audit_id, url, wcag_val, request.max_pages)
 
-        return {
+        return JSONResponse(content={
             "auditId": audit_id,
+            "audit_id": audit_id,
+            "id": audit_id,
             "status": "running",
-        }
+            "message": "Audit started successfully"
+        })
     except Exception as e:
         await db.rollback()
         logger.exception(f"Failed to start audit for {request.url}: {e}")

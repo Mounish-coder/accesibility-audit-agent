@@ -24,6 +24,8 @@ def _safe_isoformat(dt):
     if not dt:
         return None
     iso = dt.isoformat() if hasattr(dt, 'isoformat') else str(dt)
+    if " " in iso:
+        iso = iso.replace(" ", "T")
     if not iso.endswith("Z") and "+" not in iso:
         iso += "Z"
     return iso

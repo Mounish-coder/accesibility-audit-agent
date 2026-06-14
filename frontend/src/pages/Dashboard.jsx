@@ -11,6 +11,7 @@ import {
 } from 'recharts'
 import { StatCard, AnimatedCounter } from '../components/ui/GlassCard'
 import ScoreRing from '../components/ui/ScoreRing'
+import { getDashboardStats, getRecentAudits } from '../lib/api'
 
 import { format } from 'date-fns'
 import { clsx } from 'clsx'
@@ -52,7 +53,6 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const { getDashboardStats, getRecentAudits } = await import('../lib/api')
       const [statsData, recentData] = await Promise.all([
         getDashboardStats(),
         getRecentAudits(5)
@@ -101,11 +101,11 @@ export default function Dashboard() {
     return 'rgba(239,68,68,0.1)'
   }
 
-  const totalIssues = stats.criticalIssues + stats.warnings + stats.passedChecks || 1 // prevent div by zero
+  const totalIssues = (stats?.criticalIssues || 0) + (stats?.warnings || 0) + (stats?.passedChecks || 0) || 1 // prevent div by zero
   const pieData = [
-    { label: 'Critical', count: stats.criticalIssues, color: '#ef4444', pct: Math.round((stats.criticalIssues / totalIssues) * 100) },
-    { label: 'Warnings', count: stats.warnings, color: '#f97316', pct: Math.round((stats.warnings / totalIssues) * 100) },
-    { label: 'Passed', count: stats.passedChecks, color: '#10b981', pct: Math.round((stats.passedChecks / totalIssues) * 100) },
+    { label: 'Critical', count: stats?.criticalIssues || 0, color: '#ef4444', pct: Math.round(((stats?.criticalIssues || 0) / totalIssues) * 100) || 0 },
+    { label: 'Warnings', count: stats?.warnings || 0, color: '#f97316', pct: Math.round(((stats?.warnings || 0) / totalIssues) * 100) || 0 },
+    { label: 'Passed', count: stats?.passedChecks || 0, color: '#10b981', pct: Math.round(((stats?.passedChecks || 0) / totalIssues) * 100) || 0 },
   ]
 
   if (loading) {
@@ -157,12 +157,12 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <StatCard icon={Globe} label="Total Audits" value={stats.totalAudits} color="purple" delay={0} />
-        <StatCard icon={BarChart3} label="Avg Score" value={stats.avgScore} suffix="/100" color="blue" delay={0.05} />
-        <StatCard icon={AlertCircle} label="Critical Issues" value={stats.criticalIssues} color="red" delay={0.1} />
-        <StatCard icon={Activity} label="Warnings" value={stats.warnings} color="yellow" delay={0.15} />
-        <StatCard icon={CheckCircle} label="Passed Checks" value={stats.passedChecks} color="green" delay={0.2} />
-        <StatCard icon={Clock} label="Avg Duration" value={stats.avgDuration} suffix="s" color="cyan" delay={0.25} />
+        <StatCard icon={Globe} label="Total Audits" value={stats?.totalAudits || 0} color="purple" delay={0} />
+        <StatCard icon={BarChart3} label="Avg Score" value={stats?.avgScore || 0} suffix="/100" color="blue" delay={0.05} />
+        <StatCard icon={AlertCircle} label="Critical Issues" value={stats?.criticalIssues || 0} color="red" delay={0.1} />
+        <StatCard icon={Activity} label="Warnings" value={stats?.warnings || 0} color="yellow" delay={0.15} />
+        <StatCard icon={CheckCircle} label="Passed Checks" value={stats?.passedChecks || 0} color="green" delay={0.2} />
+        <StatCard icon={Clock} label="Avg Duration" value={stats?.avgDuration || 0} suffix="s" color="cyan" delay={0.25} />
       </div>
 
       {/* Charts Row */}
@@ -226,7 +226,7 @@ export default function Dashboard() {
           <h3 className="font-bold text-white mb-2">Overall Score</h3>
           <p className="text-xs text-gray-500 mb-6">Across all audited sites</p>
           <div className="flex justify-center mb-6">
-            <ScoreRing score={stats.avgScore} size={140} />
+            <ScoreRing score={stats?.avgScore || 0} size={140} />
           </div>
           <div className="space-y-3">
             {pieData.map(item => (
@@ -293,11 +293,11 @@ export default function Dashboard() {
                   <span className="text-sm font-medium text-white truncate">{audit.url}</span>
                 </div>
                 <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                  <span title={audit.createdAt ? format(new Date(audit.createdAt), 'MMM d, yyyy h:mm:ss a') : ''}>
-                    {audit.createdAt ? format(new Date(audit.createdAt), 'MMM d, yyyy • h:mm a') : 'just now'}
+                  <span title={audit?.createdAt ? format(new Date(audit.createdAt), 'MMM d, yyyy h:mm:ss a') : ''}>
+                    {audit?.createdAt ? format(new Date(audit.createdAt), 'MMM d, yyyy • h:mm a') : 'just now'}
                   </span>
                   <span>·</span>
-                  <span>{audit.duration ? audit.duration.toFixed(1) : '0'}s</span>
+                  <span>{audit?.duration ? audit.duration.toFixed(1) : '0'}s</span>
                 </div>
               </div>
 

@@ -31,7 +31,7 @@ _PLAYWRIGHT_EXECUTOR = ThreadPoolExecutor(max_workers=4, thread_name_prefix="pla
 
 # Try to import Playwright — fall back gracefully
 try:
-    from playwright.sync_api import sync_playwright
+    from playwright.async_api import async_playwright
     PLAYWRIGHT_AVAILABLE = True
 except ImportError:
     PLAYWRIGHT_AVAILABLE = False
@@ -162,11 +162,23 @@ _AXE_EVALUATE_JS = """
 """
 
 
-def _sync_scan(url: str, max_pages: int, axe_js_path: Path) -> Dict[str, Any]:
+import sys
+from concurrent.futures import ThreadPoolExecutor
+
+_SCAN_EXECUTOR = ThreadPoolExecutor(max_workers=4, thread_name_prefix="playwright_async")
+
+def _thread_scan_runner(url: str, max_pages: int, axe_js_path: Path) -> Dict[str, Any]:
     """
-    Synchronous Playwright scan — runs in a ThreadPoolExecutor thread so it
-    never conflicts with uvicorn's asyncio event loop (Windows subprocess fix).
+    Runs in a dedicated thread. Sets up a fresh ProactorEventLoop (vital for Windows
+    subprocess support) and executes the async Playwright scan. This entirely bypasses
+    uvicorn's event loop limitations and avoids the greenlet segfault.
     """
+    if sys.platform == 'win32':
+        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+    
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
     import time as _time
     start_time = _time.time()
     
@@ -174,154 +186,128 @@ def _sync_scan(url: str, max_pages: int, axe_js_path: Path) -> Dict[str, Any]:
     total_passes = 0
     pages_crawled = 0
 
-    logger.info(f"[Scanner] Starting sync scan for {url}")
-
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=True,
-            args=[
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-                "--disable-extensions",
-            ],
-        )
-        try:
-            logger.info(f"[Scanner] Browser launched for {url}")
-            context = browser.new_context(
-                user_agent=(
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/124.0.0.0 Safari/537.36"
-                ),
-                viewport={"width": 1280, "height": 800},
-                ignore_https_errors=True,
+    async def _do_scan():
+        nonlocal all_violations, total_passes, pages_crawled, url
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(
+                headless=True,
+                channel="msedge",
+                args=[
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--disable-extensions",
+                ],
             )
-            context.set_default_timeout(15000)
-
-            # Read axe script content once to avoid file IO during loop
             try:
+                if not url.startswith("http://") and not url.startswith("https://"):
+                    url = "https://" + url
+
+                context = await browser.new_context(
+                    user_agent=(
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                        "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        "Chrome/124.0.0.0 Safari/537.36"
+                    ),
+                    viewport={"width": 1280, "height": 800},
+                    ignore_https_errors=True,
+                )
+                context.set_default_timeout(30000)
+
                 axe_content = axe_js_path.read_text(encoding="utf-8")
-            except Exception as e:
-                logger.error(f"[Scanner] Failed to read axe.min.js: {e}")
-                raise
+                urls_to_visit = [url]
+                visited: set = set()
 
-            urls_to_visit = [url]
-            visited: set = set()
+                while urls_to_visit and pages_crawled < max_pages:
+                    if _time.time() - start_time > 55:
+                        logger.warning(f"[Scanner] Hard timeout reached for {url}.")
+                        break
 
-            while urls_to_visit and pages_crawled < max_pages:
-                if _time.time() - start_time > 55:
-                    logger.warning(f"[Scanner] Hard timeout (55s) reached for {url}. Returning partial results.")
-                    break
+                    current_url = urls_to_visit.pop(0)
+                    if current_url in visited:
+                        continue
+                    visited.add(current_url)
 
-                current_url = urls_to_visit.pop(0)
-                if current_url in visited:
-                    continue
-                visited.add(current_url)
-
-                logger.info(f"[Scanner] Crawling {current_url}...")
-                page = context.new_page()
-                try:
-                    # Navigate
-                    page.goto(current_url, wait_until="domcontentloaded", timeout=15000)
-                    logger.info(f"[Scanner] Page loaded: {current_url}")
-                    
-                    _time.sleep(1.0)  # grace period for JS-heavy pages
-
-                    # Inject local axe-core via content string to prevent script-load hangs
-                    page.add_script_tag(content=axe_content)
-                    logger.info(f"[Scanner] axe-core injected on {current_url}")
-
-                    # Run axe
-                    logger.info(f"[Scanner] Executing WCAG checks on {current_url}...")
-                    result = page.evaluate(_AXE_EVALUATE_JS)
-                    logger.info(f"[Scanner] WCAG checks completed on {current_url}")
-                    
-                    if result is None:
-                        result = {"violations": [], "passes": 0}
-                    if "error" in result:
-                        logger.warning(f"[Scanner] axe error on {current_url}: {result['error']}")
-
-                    viols = result.get("violations") or []
-                    passes = result.get("passes") or 0
-                    all_violations.extend(viols)
-                    total_passes += passes
-                    pages_crawled += 1
-
-                    # Collect internal links
-                    if pages_crawled < max_pages:
-                        try:
-                            links = page.evaluate("""
-                                () => Array.from(document.querySelectorAll('a[href]'))
-                                    .map(a => a.href)
-                                    .filter(h => h.startsWith(window.location.origin)
-                                             && !h.includes('#')
-                                             && !h.match(/\\.(pdf|png|jpg|gif|svg|zip)$/i))
-                                    .slice(0, 5)
-                            """)
-                            for link in (links or []):
-                                if link not in visited:
-                                    urls_to_visit.append(link)
-                        except Exception as e:
-                            logger.warning(f"[Scanner] Error extracting links from {current_url}: {e}")
-
-                except Exception as page_err:
-                    logger.warning(f"[Scanner] Failed scanning {current_url}: {page_err}")
-                finally:
+                    logger.info(f"[Scanner] Crawling {current_url}...")
+                    page = await context.new_page()
                     try:
-                        page.close()
-                    except Exception:
-                        pass
-        except Exception as browser_err:
-            logger.error(f"[Scanner] Browser execution error: {browser_err}")
-            raise
-        finally:
-            logger.info(f"[Scanner] Closing browser for {url}")
-            try:
-                browser.close()
-            except Exception as e:
-                logger.error(f"[Scanner] Error closing browser: {e}")
+                        await page.goto(current_url, wait_until="domcontentloaded", timeout=30000)
+                        logger.info(f"[Scanner] Page loaded: {current_url}")
+                        
+                        await asyncio.sleep(1.0)
+                        await page.add_script_tag(content=axe_content)
+                        result = await page.evaluate(_AXE_EVALUATE_JS)
+                        
+                        if result is None:
+                            result = {"violations": [], "passes": 0}
+                        if "error" in result:
+                            logger.warning(f"[Scanner] axe error on {current_url}: {result['error']}")
 
-    logger.info(f"[Scanner] Scan finished for {url}. Pages: {pages_crawled}, Violations: {len(all_violations)}")
+                        all_violations.extend(result.get("violations") or [])
+                        total_passes += result.get("passes") or 0
+                        pages_crawled += 1
+
+                        if pages_crawled < max_pages:
+                            try:
+                                links = await page.evaluate("""
+                                    () => Array.from(document.querySelectorAll('a[href]'))
+                                        .map(a => a.href)
+                                        .filter(h => h.startsWith(window.location.origin)
+                                                 && !h.includes('#')
+                                                 && !h.match(/\\.(pdf|png|jpg|gif|svg|zip)$/i))
+                                        .slice(0, 5)
+                                """)
+                                for link in (links or []):
+                                    if link not in visited:
+                                        urls_to_visit.append(link)
+                            except Exception as e:
+                                logger.warning(f"[Scanner] Error extracting links: {e}")
+
+                    except Exception as page_err:
+                        logger.warning(f"[Scanner] Failed scanning {current_url}: {page_err}")
+                    finally:
+                        try:
+                            await page.close()
+                        except:
+                            pass
+            finally:
+                await browser.close()
+
+    try:
+        loop.run_until_complete(asyncio.wait_for(_do_scan(), timeout=60.0))
+    except asyncio.TimeoutError:
+        logger.error(f"[Scanner] Scan timed out for {url}")
+        raise RuntimeError("Scan timed out after 60 seconds.")
+    finally:
+        loop.close()
+
+    logger.info(f"[Scanner] Finished. Pages: {pages_crawled}, Violations: {len(all_violations)}")
     return {
         "violations": all_violations,
         "passes": total_passes,
         "pages": pages_crawled,
     }
 
-
 async def scan_url_with_playwright(url: str, max_pages: int = 5) -> Dict[str, Any]:
-    """
-    Async wrapper: offloads the sync Playwright session to a thread so that
-    uvicorn's event loop is never blocked and Windows subprocess restrictions
-    are bypassed entirely. Enforces a strict 60-second execution timeout.
-    """
     if not _AXE_JS_PATH.exists():
-        raise RuntimeError(
-            f"axe.min.js not found at {_AXE_JS_PATH}. "
-            "Run: python -c \"import urllib.request; "
-            "urllib.request.urlretrieve('https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js', "
-            "'backend/app/services/axe.min.js')\""
-        )
+        raise RuntimeError("axe.min.js not found.")
 
     loop = asyncio.get_event_loop()
     try:
-        # Wrap thread execution in wait_for to prevent infinite event-loop blocking
-        result = await asyncio.wait_for(
+        return await asyncio.wait_for(
             loop.run_in_executor(
-                _PLAYWRIGHT_EXECUTOR,
-                _sync_scan,
+                _SCAN_EXECUTOR,
+                _thread_scan_runner,
                 url,
                 max_pages,
-                _AXE_JS_PATH,
+                _AXE_JS_PATH
             ),
-            timeout=60.0
+            timeout=70.0
         )
-        return result
     except asyncio.TimeoutError:
-        logger.error(f"[Scanner] Playwright scan timed out for {url} after 60 seconds")
-        raise RuntimeError("Scan timed out after 60 seconds. The site may be blocking automated requests or loading too slowly.")
+        logger.error(f"[Scanner] Hard executor timeout for {url}")
+        raise RuntimeError("Scanner thread locked up and was forcefully terminated.")
 
 
 async def run_accessibility_scan(url: str, max_pages: int = 10) -> Dict[str, Any]:

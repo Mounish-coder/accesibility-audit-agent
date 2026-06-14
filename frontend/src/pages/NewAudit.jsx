@@ -62,8 +62,12 @@ export default function NewAudit() {
       // api.js interceptor returns response.data directly (already parsed by Axios)
       const res = await startAudit(url, { max_pages, scan_depth: scanDepth, wcag_level: wcagLevel })
 
+      console.log("FULL RESPONSE", res);
+      console.log("RESPONSE DATA", res?.data);
+
       // Backend returns: { auditId, audit_id, id, status, message }
-      const newAuditId = res?.auditId || res?.audit_id || res?.id
+      // Sometimes Axios doesn't unwrap it if the interceptor is bypassed, so check both levels
+      const newAuditId = res?.auditId || res?.audit_id || res?.id || res?.data?.auditId || res?.data?.audit_id || res?.data?.id;
 
       if (!newAuditId) {
         throw new Error(`Failed to get audit ID from server. Response: ${JSON.stringify(res)}`)
@@ -89,6 +93,11 @@ export default function NewAudit() {
 
             setCompleted(true)
             toast.success('Audit completed successfully!')
+            
+            // Wait a brief moment to show 100% completion before navigating
+            setTimeout(() => {
+              navigate(`/dashboard/results/${newAuditId}`)
+            }, 1000)
           } else if (statusRes.status === 'failed') {
             clearInterval(pollTimer)
             setScanning(false)

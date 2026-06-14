@@ -8,7 +8,7 @@ from typing import Dict, List, Any, Optional
 logger = logging.getLogger(__name__)
 
 try:
-    from groq import Groq
+    from groq import AsyncGroq
     GROQ_AVAILABLE = True
 except ImportError:
     GROQ_AVAILABLE = False
@@ -265,7 +265,7 @@ def _mock_remediation(clusters: List[Dict]) -> Dict:
 
 async def _call_groq(client, prompt: str, model: str) -> Optional[Dict]:
     try:
-        resp = client.chat.completions.create(
+        resp = await client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": "You are a web accessibility expert. Always respond with valid JSON only."},
@@ -299,7 +299,7 @@ async def run_intelligence_analysis(
     4. Build remediation roadmap
     """
     use_ai = GROQ_AVAILABLE and bool(api_key)
-    client = Groq(api_key=api_key) if use_ai else None
+    client = AsyncGroq(api_key=api_key) if use_ai else None
 
     # ── Step 1: Cluster ──────────────────────────────────────────────────
     cluster_data = None

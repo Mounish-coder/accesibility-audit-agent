@@ -168,6 +168,7 @@ async def start_audit(
     db: AsyncSession = Depends(get_db),
 ):
     """Start a new accessibility audit."""
+    logger.info(f"REQUEST RECEIVED: POST /start for url={request.url}")
     try:
         url = request.url.strip()
         if not url.startswith(("http://", "https://")):
@@ -176,6 +177,7 @@ async def start_audit(
         wcag_val = request.wcag_level.value if hasattr(request.wcag_level, "value") else request.wcag_level
 
         audit_id = str(uuid.uuid4())
+        logger.info(f"AUDIT ID GENERATED: {audit_id} for url={url}")
         audit = Audit(
             id=audit_id,
             url=url,
@@ -189,13 +191,15 @@ async def start_audit(
 
         background_tasks.add_task(perform_audit, audit_id, url, wcag_val, request.max_pages)
 
-        return JSONResponse(content={
+        response_payload = {
             "auditId": audit_id,
             "audit_id": audit_id,
             "id": audit_id,
             "status": "running",
             "message": "Audit started successfully"
-        })
+        }
+        logger.info(f"RESPONSE RETURNED: returning 200 OK with payload {response_payload}")
+        return JSONResponse(content=response_payload)
     except Exception as e:
         await db.rollback()
         logger.exception(f"Failed to start audit for {request.url}: {e}")

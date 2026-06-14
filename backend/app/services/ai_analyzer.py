@@ -7,7 +7,7 @@ from typing import Dict, Any, Optional
 logger = logging.getLogger(__name__)
 
 try:
-    from groq import Groq
+    from groq import AsyncGroq
     GROQ_AVAILABLE = True
 except ImportError:
     GROQ_AVAILABLE = False
@@ -48,9 +48,9 @@ async def analyze_issue_with_ai(issue: Dict[str, Any], api_key: str, model: str 
         return _get_template_response(issue)
 
     try:
-        client = Groq(api_key=api_key)
+        client = AsyncGroq(api_key=api_key)
         
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=model,
             messages=[
                 {
@@ -102,7 +102,7 @@ async def generate_executive_summary(audit_data: Dict[str, Any], api_key: str, m
         return _get_template_summary(audit_data)
 
     try:
-        client = Groq(api_key=api_key)
+        client = AsyncGroq(api_key=api_key)
         
         prompt = f"""Write a concise executive summary for a web accessibility audit report.
 
@@ -120,7 +120,7 @@ Write 2-3 paragraphs suitable for a non-technical executive audience. Include:
 2. Key risks and compliance implications
 3. Top recommendations and expected impact"""
 
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=400,

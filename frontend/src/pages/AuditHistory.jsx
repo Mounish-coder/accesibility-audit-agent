@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { clsx } from 'clsx'
+import { getAuditHistory } from '../lib/api'
 
 export default function AuditHistory() {
   const navigate = useNavigate()
@@ -18,7 +19,6 @@ export default function AuditHistory() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const { getAuditHistory } = await import('../lib/api')
         const data = await getAuditHistory()
         setAudits(data.audits || [])
       } catch (error) {
@@ -31,11 +31,11 @@ export default function AuditHistory() {
   }, [])
 
   const filtered = audits.filter(a => {
-    const matchSearch = a.url?.toLowerCase().includes(search.toLowerCase())
+    const matchSearch = a?.url?.toLowerCase()?.includes(search.toLowerCase()) ?? false
     const matchFilter =
       filter === 'all' ? true :
-      filter === 'critical' ? (a.issues?.critical > 0 || a.critical_count > 0) :
-      filter === 'clean' ? ((a.issues?.critical === 0 && a.score >= 80) || (a.critical_count === 0 && a.score >= 80)) :
+      filter === 'critical' ? ((a?.issues?.critical || 0) > 0 || (a?.critical_count || 0) > 0) :
+      filter === 'clean' ? (((a?.issues?.critical || 0) === 0 && (a?.score || 0) >= 80) || ((a?.critical_count || 0) === 0 && (a?.score || 0) >= 80)) :
       true
     return matchSearch && matchFilter
   })
@@ -181,10 +181,10 @@ export default function AuditHistory() {
 
                   {/* Date */}
                   <div className="col-span-2">
-                    <div className="text-xs text-gray-300" title={audit.createdAt ? format(new Date(audit.createdAt), 'MMM d, yyyy h:mm:ss a') : ''}>
-                      {audit.createdAt ? format(new Date(audit.createdAt), 'MMM d, yyyy • h:mm a') : 'just now'}
+                    <div className="text-xs text-gray-300" title={audit?.createdAt ? format(new Date(audit.createdAt), 'MMM d, yyyy h:mm:ss a') : ''}>
+                      {audit?.createdAt ? format(new Date(audit.createdAt), 'MMM d, yyyy • h:mm a') : 'just now'}
                     </div>
-                    <div className="text-xs text-gray-600">{audit.createdAt ? format(new Date(audit.createdAt), 'MMM d, yyyy') : ''}</div>
+                    <div className="text-xs text-gray-600">{audit?.createdAt ? format(new Date(audit.createdAt), 'MMM d, yyyy') : ''}</div>
                   </div>
 
                   {/* Actions */}

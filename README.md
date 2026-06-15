@@ -376,63 +376,17 @@ Limitations
 - 🎭 JavaScript-heavy applications may produce varying results depending on page state.
 - 📈 Accessibility findings are based on automated WCAG checks and should be complemented with manual review for maximum accuracy.
 
----
+<h2 align="center">🎥 Project Demo Video</h2>
 
-🎬 Project Demonstration Video
+<p align="center">
+  <a href="https://drive.google.com/file/d/1i_vyQhiyfBYl7_p65BARxSnCtakH7FWp/view?usp=sharing">
+    <img src="https://img.shields.io/badge/▶%20Watch%20Demo%20Video-red?style=for-the-badge" alt="Demo Video"/>
+  </a>
+</p>
 
-«Experience the complete journey of the AccessAI Platform — from source code to live deployment, accessibility auditing, AI-powered analysis, and final reporting.»
-
-🔗 Demo Video
-
-📹 Video Link:
-🚀 To be added before final submission
-
----
-
-🌟 What This Demonstration Covers
-
-💻 Source Code Walkthrough
-
-- Complete GitHub Repository Overview
-- Frontend Architecture (React + Vite)
-- Backend Architecture (FastAPI)
-- Database & API Structure
-- Project Folder Organization
-
-🚀 Live Deployment Showcase
-
-- Render Deployment Configuration
-- Hosted Application Verification
-- Production Environment Overview
-
-🎯 Accessibility Audit Workflow
-
-- Creating a New Accessibility Audit
-- Real-Time Accessibility Scanning
-- WCAG Compliance Analysis
-- Accessibility Score Generation
-
-🤖 AI-Powered Intelligence
-
-- AI-Based Accessibility Insights
-- Automated Issue Classification
-- Smart Remediation Recommendations
-- Improvement Suggestions
-
-📊 Dashboard & Analytics
-
-- Audit Statistics Overview
-- Accessibility Trends
-- Historical Audit Records
-- Performance Metrics
-
-📋 Reports & Results
-
-- Detailed Accessibility Reports
-- Critical & Warning Issue Analysis
-- AI Recommendations Dashboard
-- Complete Audit History
-
+<p align="center">
+  Complete walkthrough of the project, including features, workflow, implementation, and results.
+</p>
 ---
 
 ✅ End-to-End Validation

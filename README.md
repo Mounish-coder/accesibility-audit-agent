@@ -39,7 +39,7 @@ AccessMind
 ## 👥 Team Information
 
 ### Shamkalla Mounish
-📄 [View Resume](./resumes/Mounish_Resume_Updated.pdf)
+📄 [View Resume](./resumes/Mounish_Resume_final.pdf)
 
 ### Shaik Saniya Khateeja
 📄 [View Resume](./resumes/saniyaresume.pdf)

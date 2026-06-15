@@ -36,45 +36,16 @@ Many websites contain accessibility issues that make them difficult to use for p
 ### 🚀 Team Name
 AccessAI Team
 
-### 👨‍💻 Team Members
+## 👥 Team Information
 
-#### Shamkalla Mounish
-**Branch:** Artificial Intelligence and Machine Learning
+### Shamkalla Mounish
+📄 [View Resume](./resumes/Mounish_Resume_Updated.pdf)
 
-**Responsibilities:**
-- Frontend Development (React)
-- Backend Development (FastAPI)
-- Accessibility Audit Integration
-- System Testing & Debugging
+### Shaik Saniya Khateeja
+📄 [View Resume](./resumes/saniyaresume.pdf)
 
-📄 [View Resume](./resumes/Mounish_Resume.pdf)
-
----
-
-#### Shaik Saniya Khateeja
-**Branch:** Artificial Intelligence and Data Science
-
-**Responsibilities:**
-- AI Integration
-- API Development Support
-- Documentation Assistance
-- Feature Validation & Testing
-
-📄 [View Resume](./resumes/Saniya_Khateeja_Resume.pdf)
-
----
-
-#### Karimunnisa Shaik
-**Branch:** Computer Science and Engineering (CSE)
-
-**Responsibilities:**
-- Quality Assurance Testing
-- Documentation Preparation
-- Requirement Validation
-- Demo & Project Verification
-
-📄 [View Resume](./resumes/Karimunnisa_Resume.pdf)
-
+### Karimunnisa Shaik
+📄 [View Resume](./resumes/Karimunnisa_Shaik_Resume_Updated.pdf)
 ## 🔗 Project Links
 
 🌐 Source Code Repository:

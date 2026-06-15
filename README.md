@@ -34,7 +34,7 @@ Many websites contain accessibility issues that make them difficult to use for p
 ## 👥 Team Information
 
 ### 🚀 Team Name
-AccessAI Team
+AccessMind
 
 ## 👥 Team Information
 

@@ -19,6 +19,18 @@ A **production-grade**, **portfolio-quality** AI application that scans websites
 Many websites contain accessibility issues that make them difficult to use for people with disabilities. Manual accessibility auditing is time-consuming and often inconsistent. AccessAI provides an AI-powered accessibility auditing platform that automatically scans websites, identifies WCAG compliance issues, generates accessibility scores, and provides intelligent recommendations to help developers improve web accessibility.
 
 
+<h2 align="center">🎥 Project Demo Video</h2>
+
+<p align="center">
+  <a href="https://drive.google.com/file/d/1i_vyQhiyfBYl7_p65BARxSnCtakH7FWp/view?usp=sharing">
+    <img src="https://img.shields.io/badge/▶%20Watch%20Demo%20Video-red?style=for-the-badge" alt="Demo Video"/>
+  </a>
+</p>
+
+<p align="center">
+  Complete walkthrough of the project, including features, workflow, implementation, and results.
+</p>
+
 👥 Team Information
 
 🚀 Team Name
